@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>API REST de Recetas</title>
+  <style>
+    body{font-family:Inter,Segoe UI,Arial;background:#f6f7fb;color:#1f2937;margin:0;padding:0}
+    .container{max-width:960px;margin:36px auto;padding:24px;background:#fff;border-radius:8px;box-shadow:0 6px 18px rgba(20,30,60,.08)}
+    h1{margin-top:0;color:#0f172a}
+    .endpoints{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .card{padding:12px;border-radius:6px;background:#f8fafc;border:1px solid #e6edf3}
+    pre{background:#0b1220;color:#e6f1ff;padding:12px;border-radius:6px;overflow:auto}
+    code{background:#eef2ff;padding:2px 6px;border-radius:4px}
+    footer{margin-top:18px;font-size:13px;color:#6b7280}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>API REST de Recetas — Vista principal</h1>
+    <p>Esta página muestra los endpoints principales y ejemplos para comenzar.</p>
+    <div class="endpoints">
+      <div class="card">
+        <h3>Endpoints</h3>
+        <ul>
+          <li><a href="{{ endpoints.recetas }}">Recetas</a></li>
+          <li><a href="{{ endpoints.ingredientes }}">Ingredientes</a></li>
+          <li><a href="{{ endpoints.categorias }}">Categorías</a></li>
+          <li><a href="{{ endpoints.valoraciones }}">Valoraciones</a></li>
+          <li><a href="{{ endpoints.favoritos }}">Favoritos</a></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Auth & reportes</h3>
+        <ul>
+          <li><a href="{{ endpoints.token }}">Obtener token (POST)</a></li>
+          <li><a href="{{ endpoints.reportes_recetas }}">Reportes de recetas</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Ejemplo: crear receta (JSON)</h3>
+    <pre>{{ example_create_receta|safe|json_script:"example" }}</pre>
+
+    <h3>Comandos rápidos</h3>
+    <div class="card">
+      <p>Obtener token (ejemplo curl):</p>
+      <pre>curl -X POST {{ endpoints.token }} -d "username=cocinero&password=Cocinero12345!"</pre>
+      <p>Crear receta (POST JSON a <code>{{ endpoints.recetas }}</code>)</p>
+    </div>
+
+    <footer>
+      Desarrollo local — Depuración y APIs públicas habilitadas para lectura (GET).
+    </footer>
+  </div>
+</body>
+</html>

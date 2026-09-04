@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}{{ receta.nombre }} | Mesa Abierta{% endblock %}
+
+{% block content %}
+<main class="container py-5">
+    <a class="text-decoration-none meta" href="{% url 'frontend:lista-recetas' %}">&larr; Volver a recetas</a>
+    <div class="row g-5 mt-2">
+        <div class="col-lg-7">
+            <p class="eyebrow">{{ receta.get_dificultad_display }} · {{ receta.tiempo_preparacion }} minutos</p>
+            <h1 class="display-5 fw-bold">{{ receta.nombre }}</h1>
+            {% if receta.descripcion %}<p class="lead">{{ receta.descripcion }}</p>{% endif %}
+            <h2 class="h4 mt-5">Preparación</h2>
+            <p class="lh-lg" style="white-space: pre-line;">{{ receta.preparacion }}</p>
+        </div>
+        <aside class="col-lg-4 offset-lg-1">
+            <div class="border rounded-2 bg-white p-4">
+                <h2 class="h5">Ingredientes</h2>
+                <ul class="ingredient-list ps-3 mb-4">
+                    {% for relacion in receta.ingredientes_receta.all %}
+                    <li>{{ relacion.cantidad }} {{ relacion.ingrediente.unidad_medida }} de {{ relacion.ingrediente.nombre }}</li>
+                    {% empty %}<li>No hay ingredientes registrados.</li>{% endfor %}
+                </ul>
+                <div class="d-flex flex-wrap gap-2">
+                    {% for categoria in receta.categorias.all %}<span class="badge text-bg-light border">#{{ categoria.nombre }}</span>{% endfor %}
+                </div>
+            </div>
+        </aside>
+    </div>
+</main>
+{% endblock %}
