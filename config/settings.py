@@ -1,10 +1,10 @@
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-# Cambiar este valor y DEBUG antes de desplegar en producción.
+# La plantilla 404 personalizada requiere DEBUG=False.
 SECRET_KEY = "django-insecure-change-me-in-production"
-DEBUG = True
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "testserver"]
+DEBUG = False
+ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
 # Aplicaciones de Django, DRF, documentación OpenAPI y la API del proyecto.
 INSTALLED_APPS = [
