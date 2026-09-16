@@ -56,7 +56,7 @@ class RecetaSerializer(serializers.ModelSerializer):
         model = Receta
         fields = [
             "id", "nombre", "descripcion", "preparacion", "tiempo_preparacion",
-            "dificultad", "cocinero", "cocinero_nombre", "estado", "categorias",
+            "tiempo_coccion", "imagen", "dificultad", "cocinero", "cocinero_nombre", "estado", "categorias",
             "ingredientes", "ingredientes_data", "promedio_puntuacion",
             "total_valoraciones", "created_at", "updated_at",
         ]

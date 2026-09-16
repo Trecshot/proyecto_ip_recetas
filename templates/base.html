@@ -31,7 +31,14 @@
         .tag { color: var(--ink); background: var(--sage); font: 700 .72rem/1 Arial, sans-serif; }
         .btn-coral { color: #fff; background: var(--coral); border-color: var(--coral); }
         .btn-coral:hover { color: #fff; background: #b9533d; border-color: #b9533d; }
+        details summary { list-style: none; cursor: pointer; }
+        details summary::-webkit-details-marker { display: none; }
+        details[open] .dropdown-menu { display: block; }
         .ingredient-list { font-family: Arial, sans-serif; }
+        .recipe-cover { min-height: 180px; object-fit: cover; background: var(--sage); }
+        .recipe-cover-fallback { min-height: 180px; display: grid; place-items: center; color: var(--ink); background: linear-gradient(135deg, var(--sage), #f4c873); font-size: 3rem; }
+        .ingredient-check { accent-color: var(--coral); }
+        .ingredient-item:has(input:checked) { color: var(--muted); text-decoration: line-through; }
         footer { color: var(--muted); font: .8rem Arial, sans-serif; }
     </style>
 </head>
