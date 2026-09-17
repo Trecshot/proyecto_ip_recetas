@@ -1,9 +1,23 @@
 import re
 
-from django.db.models import Q
+from django.db.models import Prefetch, Q
 from django.views.generic import DetailView, ListView
 
-from api.models import Categoria, Receta
+from api.models import Categoria, Receta, RecetaIngrediente
+
+
+def get_receta_queryset():
+    return (
+        Receta.objects.filter(estado=Receta.Estado.PUBLICADA)
+        .select_related("cocinero")
+        .prefetch_related(
+            "categorias",
+            Prefetch(
+                "ingredientes_receta",
+                queryset=RecetaIngrediente.objects.select_related("ingrediente"),
+            ),
+        )
+    )
 
 
 class RecetaListView(ListView):
@@ -13,11 +27,7 @@ class RecetaListView(ListView):
     paginate_by = 6
 
     def get_queryset(self):
-        queryset = (
-            Receta.objects.filter(estado=Receta.Estado.PUBLICADA)
-            .select_related("cocinero")
-            .prefetch_related("categorias", "ingredientes_receta__ingrediente")
-        )
+        queryset = get_receta_queryset()
         query = self.request.GET.get("q", "").strip()
         categoria = self.request.GET.get("categoria")
         dificultad = self.request.GET.get("dificultad")
@@ -56,11 +66,7 @@ class RecetaDetailView(DetailView):
     context_object_name = "receta"
 
     def get_queryset(self):
-        return (
-            Receta.objects.filter(estado=Receta.Estado.PUBLICADA)
-            .select_related("cocinero")
-            .prefetch_related("categorias", "ingredientes_receta__ingrediente")
-        )
+        return get_receta_queryset()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

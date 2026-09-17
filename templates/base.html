@@ -40,16 +40,57 @@
         .ingredient-check { accent-color: var(--coral); }
         .ingredient-item:has(input:checked) { color: var(--muted); text-decoration: line-through; }
         footer { color: var(--muted); font: .8rem Arial, sans-serif; }
+
+        @media print {
+            body {
+                background: #fff;
+                font-size: 12pt;
+            }
+
+            .site-nav,
+            .no-print,
+            footer,
+            .btn,
+            .badge,
+            .hero {
+                display: none !important;
+            }
+
+            .container {
+                max-width: 100% !important;
+                padding: 0 !important;
+            }
+
+            .recipe-cover,
+            .recipe-cover-fallback {
+                max-height: 220px;
+                object-fit: cover;
+            }
+
+            .ingredient-list {
+                column-count: 2;
+                column-gap: 2rem;
+            }
+
+            .ingredient-item {
+                break-inside: avoid;
+            }
+
+            .print-card {
+                border: 1px solid #d8d8d8;
+                box-shadow: none;
+            }
+        }
     </style>
 </head>
 <body>
-    <nav class="site-nav navbar navbar-dark">
+    <nav class="site-nav navbar navbar-dark no-print">
         <div class="container py-2">
             <a class="navbar-brand brand-mark fw-bold" href="{% url 'frontend:lista-recetas' %}">MESA ABIERTA</a>
             <span class="text-white-50 small">Recetas para cocinar sin prisa</span>
         </div>
     </nav>
     {% block content %}{% endblock %}
-    <footer class="container py-5 text-center">Una colección de recetas publicadas.</footer>
+    <footer class="container py-5 text-center no-print">Una colección de recetas publicadas.</footer>
 </body>
 </html>

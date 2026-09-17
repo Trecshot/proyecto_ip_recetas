@@ -1,10 +1,17 @@
+import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 BASE_DIR = Path(__file__).resolve().parent.parent
-# La plantilla 404 personalizada requiere DEBUG=False.
-SECRET_KEY = "django-insecure-change-me-in-production"
-DEBUG = False
-ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
+load_dotenv(BASE_DIR / ".env")
+
+# La plantilla 404 personalizada requiere DEBUG=False, pero en desarrollo local puede configurarse con .env.
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "django-insecure-change-me-in-production")
+DEBUG = os.getenv("DJANGO_DEBUG", "False").lower() in {"1", "true", "yes", "on"}
+ALLOWED_HOSTS = [
+    host.strip() for host in os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost").split(",") if host.strip()
+]
 
 # Aplicaciones de Django, DRF, documentación OpenAPI y la API del proyecto.
 INSTALLED_APPS = [
