@@ -338,15 +338,15 @@ class Command(BaseCommand):
     def _create_synthetic_recipes(self, total, cook):
         fake = Faker("es_ES")
         category_names = [
-            "Postres sintéticos",
-            "Entrantes sintéticos",
-            "Platos principales sintéticos",
-            "Sopas y cremas sintéticas",
+            "Postres",
+            "Entrantes",
+            "Platos principales",
+            "Sopas y cremas",
         ]
         categories = {
             name: Categoria.objects.get_or_create(
                 nombre=name,
-                defaults={"descripcion": f"Recetas generadas para pruebas de {name.lower()}"},
+                defaults={"descripcion": f"Recetas de cocina de {name.lower()}"},
             )[0]
             for name in category_names
         }
@@ -355,17 +355,57 @@ class Command(BaseCommand):
             Receta.Dificultad.MEDIA,
             Receta.Dificultad.DIFICIL,
         ]
+        dishes = [
+            ("Arroz", "con verduras asadas"),
+            ("Pasta", "con tomate y albahaca"),
+            ("Pollo", "al limón y hierbas"),
+            ("Tarta", "de manzana y canela"),
+            ("Crema", "de calabaza y jengibre"),
+            ("Ensalada", "mediterránea con garbanzos"),
+            ("Guiso", "de lentejas y verduras"),
+            ("Pescado", "al horno con limón"),
+            ("Curry", "suave de coco y verduras"),
+            ("Bizcocho", "de chocolate y nueces"),
+        ]
+        ingredient_pool = [
+            ("Tomate", "unidades"),
+            ("Cebolla", "unidades"),
+            ("Ajo", "dientes"),
+            ("Zanahoria", "unidades"),
+            ("Pimiento rojo", "unidades"),
+            ("Calabacín", "unidades"),
+            ("Arroz", "gramos"),
+            ("Pasta", "gramos"),
+            ("Lentejas", "gramos"),
+            ("Garbanzos cocidos", "gramos"),
+            ("Pechuga de pollo", "gramos"),
+            ("Filete de pescado", "gramos"),
+            ("Leche de coco", "mililitros"),
+            ("Harina", "gramos"),
+            ("Chocolate negro", "gramos"),
+            ("Manzana", "unidades"),
+            ("Aceite de oliva", "mililitros"),
+            ("Queso rallado", "gramos"),
+            ("Perejil fresco", "cucharadas"),
+            ("Pimentón dulce", "cucharaditas"),
+        ]
         recipes = []
         recipe_ingredients = []
         ingredient_counter = Ingrediente.objects.count()
 
         for index in range(total):
             category_name = random.choice(category_names)
+            dish, variation = random.choice(dishes)
+            cooking_verb = random.choice(["Preparar", "Cocinar", "Mezclar", "Hornear"])
             recipe = Receta(
-                nombre=f"{fake.sentence(nb_words=4).rstrip('.')} #{index + 1}",
-                descripcion=fake.paragraph(nb_sentences=2),
-                preparacion=" ".join(
-                    f"{step}. {fake.sentence(nb_words=10)}" for step in range(1, random.randint(4, 7))
+                nombre=f"{dish} {variation} {index + 1}",
+                descripcion=f"Una receta casera de {dish.lower()} con sabores frescos, ideal para compartir en la mesa.",
+                preparacion=(
+                    f"1. Lavar y cortar los ingredientes. "
+                    f"2. Calentar el aceite de oliva y cocinar las verduras hasta que estén tiernas. "
+                    f"3. Añadir el ingrediente principal y condimentar con sal y especias. "
+                    f"4. {cooking_verb} a fuego medio hasta que la preparación esté lista. "
+                    f"5. Servir caliente y decorar con perejil fresco."
                 ),
                 tiempo_preparacion=random.randint(15, 120),
                 tiempo_coccion=random.randint(0, 90),
@@ -375,11 +415,13 @@ class Command(BaseCommand):
             )
             recipes.append((recipe, categories[category_name]))
 
-            for ingredient_index in range(random.randint(3, 6)):
+            for ingredient_index, (ingredient_name, unit) in enumerate(
+                random.sample(ingredient_pool, random.randint(4, 7))
+            ):
                 ingredient_counter += 1
                 ingredient = Ingrediente.objects.create(
-                    nombre=f"{fake.word().capitalize()} de prueba {ingredient_counter}",
-                    unidad_medida=random.choice(["gramos", "mililitros", "unidades", "cucharadas"]),
+                    nombre=f"{ingredient_name} {ingredient_counter}",
+                    unidad_medida=unit,
                     stock=Decimal("1000"),
                 )
                 recipe_ingredients.append((recipe, ingredient, ingredient_index))
