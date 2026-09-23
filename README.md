@@ -49,10 +49,18 @@ Abre http://127.0.0.1:8000/ en el navegador. Para detener el servidor, pulsa `Ct
 
 El comando `seed_data` limpia y reconstruye las recetas, categorías e ingredientes de demostración, y crea los grupos `Administrador`, `Cocinero` y `Usuario`, además de usuarios de prueba. Las contraseñas de ejemplo solo son para desarrollo y deben cambiarse.
 
+Para añadir recetas sintéticas con Faker sin borrar las recetas existentes, pasa la cantidad como argumento:
+
+```powershell
+python manage.py seed_data 50
+```
+
+Este modo crea recetas publicadas con categorías, ingredientes y relaciones válidas para el modelo actual. Sin argumento, `seed_data` conserva su comportamiento original de reconstruir el catálogo base.
+
 ### Consideraciones importantes
 
 - `db.sqlite3` no se versiona. Al clonar el proyecto en otro equipo, ejecuta `migrate` y `seed_data` para crear la base de datos y cargar los datos de demostración.
-- `seed_data` elimina y reconstruye los datos de recetas, categorías e ingredientes. Úsalo únicamente en desarrollo y no sobre una base de datos con información real.
+- `seed_data` sin argumentos elimina y reconstruye los datos de recetas, categorías e ingredientes. El modo `seed_data N` añade `N` recetas sintéticas. Usa ambos únicamente en desarrollo y no sobre una base de datos con información real.
 - `makemigrations` solo es necesario después de modificar los modelos. En una instalación limpia ya existe la migración inicial, por lo que normalmente basta con ejecutar `migrate`.
 - La configuración actual es para desarrollo local: usa `DEBUG = True`, una clave secreta de ejemplo y hosts locales. Debe ajustarse antes de publicar la aplicación.
 - El portal web carga Bootstrap desde jsDelivr, por lo que necesita conexión a Internet para mostrar correctamente sus estilos.

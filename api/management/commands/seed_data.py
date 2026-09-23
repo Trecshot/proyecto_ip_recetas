@@ -1,8 +1,10 @@
 from decimal import Decimal
+import random
 
 from django.contrib.auth.models import Group, User
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
+from faker import Faker
 
 from ip_recetas.models import Categoria, Ingrediente, Receta, RecetaIngrediente
 
@@ -275,6 +277,14 @@ RECETAS_DATA = [
 class Command(BaseCommand):
     help = "Puebla la base de datos con roles, usuarios, categorías, ingredientes y recetas de prueba."
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "total",
+            nargs="?",
+            type=int,
+            help="Número de recetas sintéticas que se añadirán sin borrar las existentes.",
+        )
+
     def _create_roles_and_users(self):
         roles = {}
         for name in ("Administrador", "Cocinero", "Usuario"):
@@ -325,9 +335,79 @@ class Command(BaseCommand):
 
         return categories, ingredients
 
+    def _create_synthetic_recipes(self, total, cook):
+        fake = Faker("es_ES")
+        category_names = [
+            "Postres sintéticos",
+            "Entrantes sintéticos",
+            "Platos principales sintéticos",
+            "Sopas y cremas sintéticas",
+        ]
+        categories = {
+            name: Categoria.objects.get_or_create(
+                nombre=name,
+                defaults={"descripcion": f"Recetas generadas para pruebas de {name.lower()}"},
+            )[0]
+            for name in category_names
+        }
+        difficulties = [
+            Receta.Dificultad.FACIL,
+            Receta.Dificultad.MEDIA,
+            Receta.Dificultad.DIFICIL,
+        ]
+        recipes = []
+        recipe_ingredients = []
+        ingredient_counter = Ingrediente.objects.count()
+
+        for index in range(total):
+            category_name = random.choice(category_names)
+            recipe = Receta(
+                nombre=f"{fake.sentence(nb_words=4).rstrip('.')} #{index + 1}",
+                descripcion=fake.paragraph(nb_sentences=2),
+                preparacion=" ".join(
+                    f"{step}. {fake.sentence(nb_words=10)}" for step in range(1, random.randint(4, 7))
+                ),
+                tiempo_preparacion=random.randint(15, 120),
+                tiempo_coccion=random.randint(0, 90),
+                dificultad=random.choice(difficulties),
+                cocinero=cook,
+                estado=Receta.Estado.PUBLICADA,
+            )
+            recipes.append((recipe, categories[category_name]))
+
+            for ingredient_index in range(random.randint(3, 6)):
+                ingredient_counter += 1
+                ingredient = Ingrediente.objects.create(
+                    nombre=f"{fake.word().capitalize()} de prueba {ingredient_counter}",
+                    unidad_medida=random.choice(["gramos", "mililitros", "unidades", "cucharadas"]),
+                    stock=Decimal("1000"),
+                )
+                recipe_ingredients.append((recipe, ingredient, ingredient_index))
+
+        Receta.objects.bulk_create([recipe for recipe, _ in recipes])
+        for recipe, category in recipes:
+            recipe.categorias.add(category)
+        RecetaIngrediente.objects.bulk_create(
+            RecetaIngrediente(
+                receta=recipe,
+                ingrediente=ingredient,
+                cantidad=Decimal(str(random.randint(1, 500))),
+            )
+            for recipe, ingredient, _ in recipe_ingredients
+        )
+
     @transaction.atomic
     def handle(self, *args, **options):
         admin, cook, user = self._create_roles_and_users()
+
+        total = options.get("total")
+        if total is not None:
+            if total <= 0:
+                raise CommandError("El número de recetas debe ser mayor que cero.")
+            self.stdout.write(self.style.WARNING(f"Generando {total} recetas sintéticas..."))
+            self._create_synthetic_recipes(total, cook)
+            self.stdout.write(self.style.SUCCESS(f"Proceso finalizado: {total} recetas sintéticas creadas."))
+            return
 
         # Se eliminan primero las recetas para liberar sus relaciones protegidas.
         Receta.objects.all().delete()
