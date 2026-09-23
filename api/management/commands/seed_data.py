@@ -398,7 +398,7 @@ class Command(BaseCommand):
             dish, variation = random.choice(dishes)
             cooking_verb = random.choice(["Preparar", "Cocinar", "Mezclar", "Hornear"])
             recipe = Receta(
-                nombre=f"{dish} {variation} {index + 1}",
+                nombre=f"{dish} {variation}",
                 descripcion=f"Una receta casera de {dish.lower()} con sabores frescos, ideal para compartir en la mesa.",
                 preparacion=(
                     f"1. Lavar y cortar los ingredientes. "
