@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}{{ receta.nombre }} | Mesa Abierta{% endblock %}
+
+{% block content %}
+<main class="container py-5">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 no-print">
+        <a class="text-decoration-none meta" href="{% url 'frontend:lista-recetas' %}">&larr; Volver a recetas</a>
+        <button id="wake-lock-toggle" class="btn btn-outline-dark btn-sm d-none" type="button" data-enabled="false">Mantener pantalla encendida</button>
+    </div>
+
+    <div class="row g-5 mt-2">
+        <div class="col-lg-7">
+            {% if receta.imagen %}<img class="recipe-cover rounded-2 w-100 mb-4" src="{{ receta.imagen.url }}" alt="{{ receta.nombre }}">{% else %}<div class="recipe-cover-fallback rounded-2 mb-4" aria-hidden="true">🍽</div>{% endif %}
+            <p class="eyebrow">{{ receta.get_dificultad_display }} · {{ receta.tiempo_preparacion|add:receta.tiempo_coccion }} minutos</p>
+            <h1 class="display-5 fw-bold">{{ receta.nombre }}</h1>
+            {% if receta.descripcion %}<p class="lead">{{ receta.descripcion }}</p>{% endif %}
+            <div class="d-flex flex-wrap gap-3 meta mb-4">
+                <span>Preparación: {{ receta.tiempo_preparacion }} min</span>
+                {% if receta.tiempo_coccion %}<span>Cocción: {{ receta.tiempo_coccion }} min</span>{% endif %}
+                <span>Total: {{ receta.tiempo_preparacion|add:receta.tiempo_coccion }} min</span>
+            </div>
+
+            <div class="d-flex align-items-center gap-3 mb-4 no-print print-card border rounded-2 bg-white px-3 py-2">
+                <button class="btn btn-outline-dark btn-sm" type="button" data-action="decrement" aria-label="Reducir porciones">−</button>
+                <span class="meta mb-0">Porciones: <strong id="porciones-actuales">4</strong></span>
+                <button class="btn btn-outline-dark btn-sm" type="button" data-action="increment" aria-label="Aumentar porciones">+</button>
+            </div>
+
+            <h2 class="h4 mt-5">Preparación</h2>
+            <ol class="lh-lg ps-3">
+                {% for paso in pasos %}<li class="mb-3">{{ paso }}</li>{% endfor %}
+            </ol>
+        </div>
+        <aside class="col-lg-4 offset-lg-1">
+            <div class="border rounded-2 bg-white p-4 print-card">
+                <h2 class="h5">Ingredientes</h2>
+                <ul class="ingredient-list ps-3 mb-4">
+                    {% for relacion in receta.ingredientes_receta.all %}
+                    <li class="ingredient-item mb-2" data-base-cantidad="{{ relacion.cantidad|floatformat:'-3' }}" data-original-cantidad="{{ relacion.cantidad|floatformat:'-3' }}">
+                        <label>
+                            <input class="ingredient-check me-2" type="checkbox">
+                            <span class="ingredient-quantity">{{ relacion.cantidad|floatformat:"-3" }}</span>
+                            {{ relacion.ingrediente.unidad_medida }} de {{ relacion.ingrediente.nombre }}
+                        </label>
+                    </li>
+                    {% empty %}<li>No hay ingredientes registrados.</li>{% endfor %}
+                </ul>
+                <div class="d-flex flex-wrap gap-2">
+                    {% for categoria in receta.categorias.all %}<a class="badge text-bg-light border text-decoration-none" href="{% url 'frontend:lista-recetas' %}?categoria={{ categoria.pk }}">#{{ categoria.nombre }}</a>{% endfor %}
+                </div>
+            </div>
+        </aside>
+    </div>
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const basePorciones = 4;
+        const porcionesActualesEl = document.getElementById('porciones-actuales');
+        const ingredientItems = Array.from(document.querySelectorAll('[data-base-cantidad]'));
+        const buttons = Array.from(document.querySelectorAll('[data-action]'));
+
+        let porcionesActuales = basePorciones;
+
+        const formatAmount = (value) => {
+            const rounded = Number(value);
+            if (!Number.isFinite(rounded)) return '0';
+            return rounded.toFixed(3).replace(/\.000$/, '').replace(/(\.\d*?)0+$/, '$1');
+        };
+
+        const getBaseCantidad = (item) => {
+            const rawValue = item.dataset.baseCantidad || item.dataset.originalCantidad || item.querySelector('.ingredient-quantity')?.textContent || '0';
+            const parsed = Number.parseFloat(String(rawValue).replace(',', '.'));
+            return Number.isFinite(parsed) ? parsed : 0;
+        };
+
+        const updateIngredients = () => {
+            if (!porcionesActualesEl) return;
+            porcionesActualesEl.textContent = String(porcionesActuales);
+
+            ingredientItems.forEach((item) => {
+                const baseCantidad = getBaseCantidad(item);
+                const cantidad = (baseCantidad * porcionesActuales) / basePorciones;
+                const quantityEl = item.querySelector('.ingredient-quantity');
+                if (quantityEl) {
+                    quantityEl.textContent = formatAmount(cantidad);
+                }
+            });
+        };
+
+        buttons.forEach((button) => {
+            button.addEventListener('click', function () {
+                const action = button.dataset.action;
+                if (action === 'decrement') {
+                    porcionesActuales = Math.max(1, porcionesActuales - 1);
+                }
+                if (action === 'increment') {
+                    porcionesActuales = Math.min(20, porcionesActuales + 1);
+                }
+                updateIngredients();
+            });
+        });
+
+        updateIngredients();
+
+        const wakeLockButton = document.getElementById('wake-lock-toggle');
+        if (wakeLockButton && 'wakeLock' in navigator) {
+            wakeLockButton.classList.remove('d-none');
+            let wakeLock = null;
+
+            const setWakeLockState = async (enabled) => {
+                try {
+                    if (enabled) {
+                        wakeLock = await navigator.wakeLock.request('screen');
+                    } else if (wakeLock) {
+                        await wakeLock.release();
+                        wakeLock = null;
+                    }
+                    wakeLockButton.dataset.enabled = String(enabled);
+                    wakeLockButton.textContent = enabled ? 'Pantalla activa' : 'Mantener pantalla encendida';
+                } catch (error) {
+                    wakeLockButton.textContent = 'No disponible en este navegador';
+                }
+            };
+
+            wakeLockButton.addEventListener('click', function () {
+                const enabled = wakeLockButton.dataset.enabled === 'true';
+                setWakeLockState(!enabled);
+            });
+        }
+    });
+</script>
+{% endblock %}

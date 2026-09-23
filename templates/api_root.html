@@ -1,0 +1,49 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>API REST de Recetas</title>
+  <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+</head>
+<body class="api-root">
+  <div class="container">
+    <h1>API REST de Recetas — Vista principal</h1>
+    <p>Esta página muestra los endpoints principales y ejemplos para comenzar.</p>
+    <div class="endpoints">
+      <div class="card">
+        <h3>Endpoints</h3>
+        <ul>
+          <li><a href="{{ endpoints.recetas }}">Recetas</a></li>
+          <li><a href="{{ endpoints.ingredientes }}">Ingredientes</a></li>
+          <li><a href="{{ endpoints.categorias }}">Categorías</a></li>
+          <li><a href="{{ endpoints.valoraciones }}">Valoraciones</a></li>
+          <li><a href="{{ endpoints.favoritos }}">Favoritos</a></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Auth & reportes</h3>
+        <ul>
+          <li><a href="{{ endpoints.token }}">Obtener token (POST)</a></li>
+          <li><a href="{{ endpoints.reportes_recetas }}">Reportes de recetas</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Ejemplo: crear receta (JSON)</h3>
+    <pre>{{ example_create_receta|safe|json_script:"example" }}</pre>
+
+    <h3>Comandos rápidos</h3>
+    <div class="card">
+      <p>Obtener token (ejemplo curl):</p>
+      <pre>curl -X POST {{ endpoints.token }} -d "username=cocinero&password=Cocinero12345!"</pre>
+      <p>Crear receta (POST JSON a <code>{{ endpoints.recetas }}</code>)</p>
+    </div>
+
+    <footer>
+      Desarrollo local — Depuración y APIs públicas habilitadas para lectura (GET).
+    </footer>
+  </div>
+</body>
+</html>
