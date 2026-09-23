@@ -1,7 +1,7 @@
 import django_filters
 from django.db.models import Avg, Count
 
-from .models import Receta
+from ip_recetas.models import Receta
 
 
 class RecetaFilter(django_filters.FilterSet):

@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "django_filters",
     "api.apps.ApiConfig",
+    "ip_recetas.apps.IpRecetasConfig",
     "drf_spectacular",
     "drf_spectacular_sidecar",
 ]

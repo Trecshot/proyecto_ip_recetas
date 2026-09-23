@@ -138,7 +138,8 @@ curl -X POST -H "Authorization: Token <token>" http://127.0.0.1:8000/api/recetas
 
 ## 5. Estructura del proyecto
 
-- `api/`: modelos, serializers, ViewSets, filtros y endpoints REST.
+- `ip_recetas/`: modelos y dominio central de recetas.
+- `api/`: serializers, ViewSets, filtros y endpoints REST.
 - `frontend/`: vistas basadas en clases y URLs del portal web.
 - `templates/`: plantillas HTML con herencia Django y Bootstrap 5.
 - `config/`: configuración global y enrutamiento principal.

@@ -15,7 +15,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes
 
 from .filters import RecetaFilter
-from .models import Auditoria, Categoria, Favorito, Ingrediente, HistorialReceta, Receta, Valoracion
+from ip_recetas.models import Auditoria, Categoria, Favorito, Ingrediente, HistorialReceta, Receta, Valoracion
 from .permissions import IsCookOrAdmin, OwnResourcePermission, RecipePermission
 from .serializers import CategoriaSerializer, FavoritoSerializer, IngredienteSerializer, RecetaSerializer, ValoracionSerializer
 

@@ -3,7 +3,7 @@ import re
 from django.db.models import Prefetch, Q
 from django.views.generic import DetailView, ListView
 
-from api.models import Categoria, Receta, RecetaIngrediente
+from ip_recetas.models import Categoria, Receta, RecetaIngrediente
 
 
 def get_receta_queryset():

@@ -1,5 +1,6 @@
 from django.apps import AppConfig
 
 
-class NombreAplicacionConfig(AppConfig):
-    name = 'nombre_aplicacion'
+class IpRecetasConfig(AppConfig):
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "ip_recetas"

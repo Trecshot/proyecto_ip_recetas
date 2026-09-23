@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Auditoria, Categoria, Favorito, HistorialReceta, Ingrediente, Receta, RecetaIngrediente, Valoracion
+from ip_recetas.models import Auditoria, Categoria, Favorito, HistorialReceta, Ingrediente, Receta, RecetaIngrediente, Valoracion
 
 
 @admin.register(Receta)
